@@ -38,28 +38,57 @@ public class HumanHandAnimator : MonoBehaviour
         new Finger(FingerType.Thumb)
     };
 
-    private void OnEnable()
+    public void SetInputActions(InputActionReference grip, InputActionReference trigger, InputActionReference primary)
     {
-        controllerActionGrip.action.performed += GripActionPerformed;
-        controllerActionGrip.action.canceled += GripActionCanceled;
+        bool wasEnabled = isActiveAndEnabled;
+        if (wasEnabled) UnsubscribeActions();
 
-        controllerActionTrigger.action.performed += TriggerActionPerformed;
-        controllerActionTrigger.action.canceled += TriggerActionCanceled;
+        controllerActionGrip    = grip;
+        controllerActionTrigger = trigger;
+        controllerActionPrimary = primary;
 
-        controllerActionPrimary.action.performed += PrimaryActionPerformed;
-        controllerActionPrimary.action.canceled += PrimaryActionCanceled;
+        if (wasEnabled) SubscribeActions();
     }
 
-    private void OnDisable()
+    private void OnEnable()  => SubscribeActions();
+    private void OnDisable() => UnsubscribeActions();
+
+    private void SubscribeActions()
     {
-        controllerActionGrip.action.performed -= GripActionPerformed;
-        controllerActionGrip.action.canceled -= GripActionCanceled;
+        if (controllerActionGrip != null)
+        {
+            controllerActionGrip.action.performed += GripActionPerformed;
+            controllerActionGrip.action.canceled  += GripActionCanceled;
+        }
+        if (controllerActionTrigger != null)
+        {
+            controllerActionTrigger.action.performed += TriggerActionPerformed;
+            controllerActionTrigger.action.canceled  += TriggerActionCanceled;
+        }
+        if (controllerActionPrimary != null)
+        {
+            controllerActionPrimary.action.performed += PrimaryActionPerformed;
+            controllerActionPrimary.action.canceled  += PrimaryActionCanceled;
+        }
+    }
 
-        controllerActionTrigger.action.performed -= TriggerActionPerformed;
-        controllerActionTrigger.action.canceled -= TriggerActionCanceled;
-
-        controllerActionPrimary.action.performed -= PrimaryActionPerformed;
-        controllerActionPrimary.action.canceled -= PrimaryActionCanceled;
+    private void UnsubscribeActions()
+    {
+        if (controllerActionGrip != null)
+        {
+            controllerActionGrip.action.performed -= GripActionPerformed;
+            controllerActionGrip.action.canceled  -= GripActionCanceled;
+        }
+        if (controllerActionTrigger != null)
+        {
+            controllerActionTrigger.action.performed -= TriggerActionPerformed;
+            controllerActionTrigger.action.canceled  -= TriggerActionCanceled;
+        }
+        if (controllerActionPrimary != null)
+        {
+            controllerActionPrimary.action.performed -= PrimaryActionPerformed;
+            controllerActionPrimary.action.canceled  -= PrimaryActionCanceled;
+        }
     }
 
     void Start()
