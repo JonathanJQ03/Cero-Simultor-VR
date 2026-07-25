@@ -42,6 +42,9 @@ public class VRHandsSetup : MonoBehaviour
             Debug.Log("[VRHandsSetup] XRInteractionManager creado automaticamente.");
         }
 
+        // Agregar locomotion si no existe (moverse con joystick izquierdo, girar con derecho)
+        SetupLocomotion();
+
         _leftCtrl  = transform.Find("Camera Offset/LeftHand Controller");
         _rightCtrl = transform.Find("Camera Offset/RightHand Controller");
 
@@ -231,5 +234,13 @@ public class VRHandsSetup : MonoBehaviour
     {
         var action = asset?.FindAction(path);
         return action != null ? InputActionReference.Create(action) : null;
+    }
+
+    void SetupLocomotion()
+    {
+        if (GetComponent<VRLocomotion>() == null)
+            gameObject.AddComponent<VRLocomotion>();
+        if (GetComponent<VRInputController>() == null)
+            gameObject.AddComponent<VRInputController>();
     }
 }
