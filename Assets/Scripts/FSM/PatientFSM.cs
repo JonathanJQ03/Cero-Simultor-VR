@@ -39,7 +39,21 @@ public class PatientFSM : MonoBehaviour
     public void InitializeFSM()
     {
         states = new Dictionary<string, PatientState>();
+        BuildHemorragiaStates();
+        BuildViaAereaStates();
+        BuildParoCardiacoStates();
+        BuildTerminalStates();
 
+        // Select starting state based on the case assigned by PatientCaseManager
+        if (PatientCaseManager.Instance != null &&
+            PatientCaseManager.Instance.CurrentCase.caseType == CaseType.ViaAereaBlockeada)
+            startStateId = "ESPERANDO_CANULA";
+        else
+            startStateId = "ESPERANDO_BISTURI";
+    }
+
+    void BuildHemorragiaStates()
+    {
         var hemoA = new PatientState(
             id: "ESPERANDO_BISTURI",
             displayName: "Corte",
@@ -93,6 +107,47 @@ public class PatientFSM : MonoBehaviour
         );
         states[hemoC.id] = hemoC;
 
+    }
+
+    void BuildViaAereaStates()
+    {
+        var viaA = new PatientState(
+            id: "ESPERANDO_CANULA",
+            displayName: "Vía Aérea Básica",
+            condition: PatientCondition.ViaAereaBlockeada,
+            description: "Use Cánula de Guedel para abrir la vía aérea",
+            timeLimitSeconds: 15f,
+            allowedTools: new List<string> { "CanulaDeGuedel" },
+            toolTransitions: new Dictionary<string, string>
+            {
+                { "CanulaDeGuedel", "ESPERANDO_LARINGOSCOPIO" }
+            },
+            timeoutTransition: "FALLECIDO",
+            criticalErrorTransition: "PARO_EPINEFRINA",
+            criticalErrorTools: new List<string> { "Bisturi", "Desfibrilador" }
+        );
+        states[viaA.id] = viaA;
+
+        var viaB = new PatientState(
+            id: "ESPERANDO_LARINGOSCOPIO",
+            displayName: "Intubación",
+            condition: PatientCondition.ViaAereaBlockeada,
+            description: "Use Laringoscopio para asegurar la vía aérea e intubar",
+            timeLimitSeconds: 20f,
+            allowedTools: new List<string> { "Laringoscopio" },
+            toolTransitions: new Dictionary<string, string>
+            {
+                { "Laringoscopio", "ESTABILIZADO" }
+            },
+            timeoutTransition: "FALLECIDO",
+            criticalErrorTransition: "PARO_EPINEFRINA",
+            criticalErrorTools: new List<string> { "Desfibrilador", "Torniquete" }
+        );
+        states[viaB.id] = viaB;
+    }
+
+    void BuildParoCardiacoStates()
+    {
         var paroD = new PatientState(
             id: "PARO_EPINEFRINA",
             displayName: "Epinefrina",
@@ -143,12 +198,15 @@ public class PatientFSM : MonoBehaviour
             criticalErrorTools: null
         );
         states[recuperado.id] = recuperado;
+    }
 
+    void BuildTerminalStates()
+    {
         var estabilizado = new PatientState(
             id: "ESTABILIZADO",
             displayName: "Estable",
             condition: PatientCondition.Estabilizado,
-            description: "Hemorragia controlada. Paciente estable.",
+            description: "Paciente estabilizado con éxito.",
             timeLimitSeconds: 0,
             allowedTools: new List<string>(),
             toolTransitions: new Dictionary<string, string>(),
@@ -171,8 +229,6 @@ public class PatientFSM : MonoBehaviour
             criticalErrorTools: null
         );
         states[fallecido.id] = fallecido;
-
-        startStateId = "ESPERANDO_BISTURI";
     }
 
     public void StartSimulation()

@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/MenuPrincipal.unity
     guid: 607284041d7d2b64e8db11bf4c6474ed
   - enabled: 1
+    path: Assets/Scenes/EscenaAccidente.unity
+    guid: 78ad0f11c972f7044b0b1b0222d24253
+  - enabled: 1
+    path: Assets/Scenes/ReportePaciente.unity
+    guid: 983af0d716ec5af4388688737c6954ce
+  - enabled: 1
+    path: Assets/Scenes/SeleccionHerramientas.unity
+    guid: 12447d7b82dce464c8f221eeff06f4cc
+  - enabled: 1
     path: Assets/Scenes/Piso Quirofano.unity
     guid: 14fbd292e2df2a03c85dd77ad3a2d15f
   - enabled: 1
@@ -17,7 +26,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ExplorarHerramientas.unity
     guid: 694510c5af725134abf4a95b9518872e
+  - enabled: 1
+    path: Assets/Scenes/Configuracion.unity
+    guid: de44931e46e1d8941b16e1614a2602ce
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3c1fa28604d6c0b679c6f1fc333eac8a, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: c8a05d330b3aa7f41a6a91be9b7e6426, type: 2}

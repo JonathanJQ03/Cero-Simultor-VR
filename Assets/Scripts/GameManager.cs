@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         if (messageController == null) messageController = FindObjectOfType<MessageController>();
     }
 
-    void Start()
+void Start()
     {
         if (fsm == null) return;
 
@@ -56,25 +56,9 @@ public class GameManager : MonoBehaviour
         fsm.OnCriticalError += OnCriticalError;
         fsm.OnSimulationEnd += OnSimulationEnd;
 
-        if (diagnosticScreen != null)
-            diagnosticScreen.SetActive(false);
-        if (toolSelectionPanel != null)
-            toolSelectionPanel.SetActive(false);
-        if (resultsPanel != null)
-            resultsPanel.SetActive(false);
-
-        if (patient != null)
-            patient.InitializePatient();
-
-        fsm.StartSimulation();
-
-        if (gameTimer != null)
-            gameTimer.StartTimer();
-
-        simulationStarted = true;
-
-        if (messageController != null)
-            messageController.ShowInfo("Use Bisturi o Tijeras de Trauma para exponer la herida");
+        if (diagnosticScreen != null) diagnosticScreen.SetActive(false);
+        if (toolSelectionPanel != null) toolSelectionPanel.SetActive(false);
+        if (resultsPanel != null) resultsPanel.SetActive(false);
     }
 
     public void StartSimulation()
@@ -99,6 +83,13 @@ public class GameManager : MonoBehaviour
         if (messageController != null)
             messageController.ShowInfo("Use Bisturi o Tijeras de Trauma para exponer la herida");
     }
+
+public float GetElapsedTime()
+    {
+        if (gameTimer != null) return gameTimer.GetElapsedTime();
+        return 0f;
+    }
+
 
     public void StartDiagnosticPhase()
     {
@@ -183,26 +174,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void OnSimulationEnd(bool success)
+void OnSimulationEnd(bool success)
     {
-        if (gameTimer != null)
-            gameTimer.StopTimer();
-
-        if (resultsPanel != null)
-        {
-            resultsPanel.SetActive(true);
-            if (resultsSuccessText != null)
-                resultsSuccessText.SetActive(success);
-            if (resultsFailText != null)
-                resultsFailText.SetActive(!success);
-        }
+        if (gameTimer != null) gameTimer.StopTimer();
 
         if (messageController != null)
         {
-            if (success)
-                messageController.ShowSuccess("Paciente estabilizado!");
-            else
-                messageController.ShowError("El paciente ha fallecido.");
+            if (success) messageController.ShowSuccess("Paciente estabilizado!");
+            else messageController.ShowError("El paciente ha fallecido.");
         }
 
         if (success && alarmAudioSource != null && successClip != null)
@@ -210,6 +189,9 @@ public class GameManager : MonoBehaviour
             alarmAudioSource.clip = successClip;
             alarmAudioSource.Play();
         }
+
+        if (GameFlowController.Instance != null)
+            GameFlowController.Instance.OnSimulationEnd(success);
     }
 
     string GetSuccessMessage(string toolId)

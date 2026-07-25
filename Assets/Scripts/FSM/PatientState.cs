@@ -3,6 +3,7 @@ using System.Collections.Generic;
 public enum PatientCondition
 {
     HemorragiaActiva,
+    ViaAereaBlockeada,
     ParoCardiaco,
     Estabilizado,
     Fallecido

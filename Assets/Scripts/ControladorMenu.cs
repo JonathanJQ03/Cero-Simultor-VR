@@ -5,8 +5,8 @@ public class ControladorMenu : MonoBehaviour
 {
     public void IniciarJuego()
     {
-        Debug.Log("Cargando el quirófano...");
-        SceneManager.LoadScene("Piso Quirofano");
+        Debug.Log("Cargando escena accidente...");
+        SceneManager.LoadScene("EscenaAccidente");
     }
 
     public void ExplorarHerramientas()
