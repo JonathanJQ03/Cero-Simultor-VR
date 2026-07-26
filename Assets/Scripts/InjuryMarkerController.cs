@@ -15,8 +15,15 @@ public class InjuryMarkerController : MonoBehaviour
     public GameObject markerTorax;
     public GameObject markerMuslo;
 
+    [Header("Zona de Interacción")]
+    [Tooltip("Radio del trigger esférico que detecta la herramienta (metros)")]
+    public float zoneRadius = 0.18f;
+
+    [Tooltip("Socket fijo antiguo (blue rectangle) — se desactiva al iniciar")]
+    public GameObject legacySocket;
+
     [Header("Pulse")]
-    public float pulseSpeed  = 2.0f;
+    public float pulseSpeed = 2.0f;
     [Range(0.7f, 1f)]  public float pulseMin = 0.85f;
     [Range(1f, 1.5f)]  public float pulseMax = 1.15f;
 
@@ -25,10 +32,31 @@ public class InjuryMarkerController : MonoBehaviour
     Vector3    _baseScale1;
     Vector3    _baseScale2;
 
-    // Llamado por GameManager.StartSimulation() — no en Start()
-    // para garantizar que el caso ya está asignado al momento de activar.
+    void Awake()
+    {
+        // Asegurar que cada marker tenga su InjuryZone (trigger esférico)
+        GameObject[] all = { markerBoca, markerBrazoIzq, markerBrazoDer,
+                              markerPiernaIzq, markerPiernaDer, markerTorax, markerMuslo };
+        foreach (var m in all)
+            EnsureInjuryZone(m);
+    }
+
+    void EnsureInjuryZone(GameObject marker)
+    {
+        if (marker == null) return;
+        if (marker.GetComponent<InjuryZone>() == null)
+            marker.AddComponent<InjuryZone>();          // RequireComponent agrega SphereCollider
+        // Sincronizar radio con el campo configurable
+        var col = marker.GetComponent<SphereCollider>();
+        if (col != null) col.radius = zoneRadius;
+    }
+
+    // Llamado por GameManager.StartSimulation()
     public void Initialize()
     {
+        // Desactivar el socket fijo heredado si está asignado
+        if (legacySocket != null) legacySocket.SetActive(false);
+
         HideAll();
         _activeMarker  = null;
         _activeMarker2 = null;

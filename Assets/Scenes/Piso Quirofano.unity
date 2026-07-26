@@ -6654,6 +6654,8 @@ MonoBehaviour:
   markerPiernaDer: {fileID: 1640614557}
   markerTorax: {fileID: 469003924}
   markerMuslo: {fileID: 1825125744}
+  zoneRadius: 0.18
+  legacySocket: {fileID: 1514657041}
   pulseSpeed: 2
   pulseMin: 0.85
   pulseMax: 1.15
@@ -6689,14 +6691,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56fe6e900b578a4fb33fd3e027044dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultsController
-  titleText: {fileID: 0}
-  subtitleText: {fileID: 0}
-  statsText: {fileID: 0}
-  feedbackText: {fileID: 0}
-  btnReiniciar: {fileID: 0}
-  btnMenu: {fileID: 0}
-  successColor: {r: 0, g: 1, b: 0.25, a: 1}
-  failureColor: {r: 0.55, g: 0, b: 0, a: 1}
+  winAccent: {r: 0.1, g: 0.79, b: 0.42, a: 1}
+  loseAccent: {r: 0.8, g: 0.2, b: 0.2, a: 1}
+  overlayColor: {r: 0.02, g: 0.04, b: 0.09, a: 0.93}
 --- !u!1 &1174605185
 GameObject:
   m_ObjectHideFlags: 0
