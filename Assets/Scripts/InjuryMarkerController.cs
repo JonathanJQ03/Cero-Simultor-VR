@@ -16,8 +16,8 @@ public class InjuryMarkerController : MonoBehaviour
     public GameObject markerMuslo;
 
     [Header("Zona de Interacción")]
-    [Tooltip("Radio del trigger esférico que detecta la herramienta (metros)")]
-    public float zoneRadius = 0.18f;
+    [Tooltip("Radio del trigger en espacio local del marcador (0.5 = coincide con la esfera visual)")]
+    public float zoneRadius = 0.5f;
 
     [Tooltip("Socket fijo antiguo (blue rectangle) — se desactiva al iniciar")]
     public GameObject legacySocket;
@@ -45,8 +45,16 @@ public class InjuryMarkerController : MonoBehaviour
     {
         if (marker == null) return;
         if (marker.GetComponent<InjuryZone>() == null)
-            marker.AddComponent<InjuryZone>();          // RequireComponent agrega SphereCollider
-        // Sincronizar radio con el campo configurable
+            marker.AddComponent<InjuryZone>();
+
+        // Rigidbody cinemático necesario para que OnTriggerEnter detecte
+        // herramientas XR (que son cinemáticas mientras se sostienen).
+        // Sin esto: static trigger vs kinematic Rigidbody = sin evento.
+        var rb = marker.GetComponent<Rigidbody>();
+        if (rb == null) rb = marker.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.useGravity  = false;
+
         var col = marker.GetComponent<SphereCollider>();
         if (col != null) col.radius = zoneRadius;
     }

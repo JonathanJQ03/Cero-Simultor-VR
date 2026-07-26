@@ -119,6 +119,19 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!134 &104141054
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!21 &110060795
 Material:
   serializedVersion: 8
@@ -1934,6 +1947,7 @@ GameObject:
   - component: {fileID: 469003926}
   - component: {fileID: 469003929}
   - component: {fileID: 469003928}
+  - component: {fileID: 469003930}
   m_Layer: 0
   m_Name: Marker_Torax
   m_TagString: Untagged
@@ -2026,7 +2040,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &469003929
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2046,8 +2061,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &469003930
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469003924}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &499065938
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2931,6 +2973,7 @@ GameObject:
   - component: {fileID: 630292043}
   - component: {fileID: 630292046}
   - component: {fileID: 630292045}
+  - component: {fileID: 630292047}
   m_Layer: 0
   m_Name: Marker_BrazoDer
   m_TagString: Untagged
@@ -3023,7 +3066,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &630292046
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3043,8 +3087,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &630292047
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630292041}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &659096256
 GameObject:
   m_ObjectHideFlags: 0
@@ -4951,6 +5022,7 @@ GameObject:
   - component: {fileID: 1052195442}
   - component: {fileID: 1052195445}
   - component: {fileID: 1052195444}
+  - component: {fileID: 1052195446}
   m_Layer: 0
   m_Name: Marker_PiernaIzq
   m_TagString: Untagged
@@ -5043,7 +5115,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &1052195445
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5051,7 +5124,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1052195440}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 104141054}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5063,8 +5136,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1052195446
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052195440}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1057597495
 GameObject:
   m_ObjectHideFlags: 0
@@ -8975,6 +9075,7 @@ GameObject:
   - component: {fileID: 1596435312}
   - component: {fileID: 1596435315}
   - component: {fileID: 1596435314}
+  - component: {fileID: 1596435316}
   m_Layer: 0
   m_Name: Marker_BrazoIzq
   m_TagString: Untagged
@@ -9067,7 +9168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &1596435315
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9087,8 +9189,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1596435316
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1596435310}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1608332610
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9630,6 +9759,7 @@ GameObject:
   - component: {fileID: 1640614559}
   - component: {fileID: 1640614562}
   - component: {fileID: 1640614561}
+  - component: {fileID: 1640614563}
   m_Layer: 0
   m_Name: Marker_PiernaDer
   m_TagString: Untagged
@@ -9722,7 +9852,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &1640614562
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9742,8 +9873,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1640614563
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640614557}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1662261291
 GameObject:
   m_ObjectHideFlags: 0
@@ -10370,6 +10528,7 @@ GameObject:
   - component: {fileID: 1700268647}
   - component: {fileID: 1700268650}
   - component: {fileID: 1700268649}
+  - component: {fileID: 1700268651}
   m_Layer: 0
   m_Name: Marker_Boca
   m_TagString: Untagged
@@ -10386,7 +10545,7 @@ Transform:
   m_GameObject: {fileID: 1700268645}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.483, y: 1.22, z: 0}
+  m_LocalPosition: {x: -1.61, y: 1.22, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10462,7 +10621,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &1700268650
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -10482,8 +10642,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1700268651
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700268645}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1726470963
 GameObject:
   m_ObjectHideFlags: 0
@@ -11293,6 +11480,7 @@ GameObject:
   - component: {fileID: 1825125746}
   - component: {fileID: 1825125749}
   - component: {fileID: 1825125748}
+  - component: {fileID: 1825125750}
   m_Layer: 0
   m_Name: Marker_Muslo
   m_TagString: Untagged
@@ -11385,7 +11573,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
   triggerRadius: 0.15
-  interactionCooldown: 2
+  countdownSeconds: 5
+  retireMessageDelay: 2
 --- !u!135 &1825125749
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -11405,8 +11594,35 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1825125750
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825125744}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &1844261596
 MonoBehaviour:
   m_ObjectHideFlags: 0
