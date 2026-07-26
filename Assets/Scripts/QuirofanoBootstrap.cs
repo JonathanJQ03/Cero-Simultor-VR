@@ -9,13 +9,13 @@ public class QuirofanoBootstrap : MonoBehaviour
 {
     void Awake()
     {
-        bool cameFromSelector = PatientCaseManager.Instance != null
-                                && PatientCaseManager.Instance.SelectedTools.Count > 0;
+        bool ready = PatientCaseManager.Instance != null
+                     && PatientCaseManager.Instance.ReadyToSimulate();
 
-        if (!cameFromSelector)
+        if (!ready)
         {
-            Debug.Log("[QuirofanoBootstrap] Inicio directo detectado — redirigiendo a SeleccionHerramientas.");
-            SceneManager.LoadScene("SeleccionHerramientas");
+            Debug.Log("[QuirofanoBootstrap] Flujo incompleto — redirigiendo a MenuPrincipal.");
+            SceneManager.LoadScene("MenuPrincipal");
         }
     }
 }

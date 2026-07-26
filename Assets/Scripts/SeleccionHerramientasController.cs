@@ -23,6 +23,9 @@ public class SeleccionHerramientasController : MonoBehaviour
     public TextMeshProUGUI txtCounter;
     public GameObject btnIngresar;
 
+    [Header("Case Context")]
+    public TextMeshProUGUI txtCaseReminder;
+
     static readonly Color selectedBg      = new Color(0.04f, 0.22f, 0.10f, 1.00f);
     static readonly Color deselectedBg    = new Color(0.10f, 0.14f, 0.18f, 0.95f);
     static readonly Color selectedOverlay = new Color(0.10f, 0.90f, 0.45f, 0.18f);
@@ -37,7 +40,23 @@ public class SeleccionHerramientasController : MonoBehaviour
         if (PatientCaseManager.Instance == null)
             new GameObject("PatientCaseManager").AddComponent<PatientCaseManager>();
 
+        ApplyCaseReminder();
         RefreshAll();
+    }
+
+    void ApplyCaseReminder()
+    {
+        if (txtCaseReminder == null) return;
+        var data = PatientCaseManager.Instance?.CurrentCase;
+        if (data == null) return;
+
+        bool isHemo = data.caseType == CaseType.HemorragiaActiva;
+        txtCaseReminder.text = isHemo
+            ? "CASO ASIGNADO: HEMORRAGIA ACTIVA\nSelecciona las herramientas para controlar la hemorragia."
+            : "CASO ASIGNADO: VÍA AÉREA BLOQUEADA\nSelecciona las herramientas para asegurar la vía aérea.";
+        txtCaseReminder.color = isHemo
+            ? new Color(0.95f, 0.25f, 0.25f, 1f)
+            : new Color(0.25f, 0.60f, 1.00f, 1f);
     }
 
     public void OnToolClicked(int index)

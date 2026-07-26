@@ -32,7 +32,12 @@ public class GameFlowController : MonoBehaviour
         Instance = this;
     }
 
-    void Start() => GoToPhase(GamePhase.ReportePaciente);
+    void Start()
+    {
+        GoToPhase(GamePhase.Simulacion);
+        var gm = GameManager.Instance ?? FindObjectOfType<GameManager>();
+        if (gm != null) gm.StartSimulation();
+    }
 
     public void GoToPhase(GamePhase phase)
     {
@@ -60,8 +65,9 @@ public class GameFlowController : MonoBehaviour
 
     public void BtnReiniciar()
     {
-        SelectedTools.Clear();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (PatientCaseManager.Instance != null)
+            PatientCaseManager.Instance.GenerateNewCase();
+        SceneManager.LoadScene("EscenaAccidente");
     }
 
     public void BtnMenu() => SceneManager.LoadScene("MenuPrincipal");

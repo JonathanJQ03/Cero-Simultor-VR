@@ -31,6 +31,10 @@ public class MonitorDisplayController : MonoBehaviour
     public Image             physStatFill;
     public TextMeshProUGUI   txtPhysStat;    // "PHYS STAT: 42%"
 
+    // ── Diagnosis ────────────────────────────────────────────────────────
+    [Header("Diagnosis")]
+    public TextMeshProUGUI   txtDiagnosis;   // "HEMORRAGIA ACTIVA" / "VIA AEREA BLOQUEADA"
+
     // ── Runtime vitals ───────────────────────────────────────────────────
     float _hr, _spo2, _sysBP, _diaBP, _physStat;
     float _tHR, _tSpo2, _tSysBP, _tDiaBP, _tPhysStat;
@@ -87,11 +91,20 @@ public class MonitorDisplayController : MonoBehaviour
         if (PatientCaseManager.Instance?.CurrentCase != null)
         {
             var d = PatientCaseManager.Instance.CurrentCase;
-            _tHR     = _hr     = d.heartRate;
-            _tSpo2   = _spo2   = d.spo2;
-            _tSysBP  = _sysBP  = d.systolicBP;
-            _tDiaBP  = _diaBP  = d.diastolicBP;
+            _tHR       = _hr       = d.heartRate;
+            _tSpo2     = _spo2     = d.spo2;
+            _tSysBP    = _sysBP    = d.systolicBP;
+            _tDiaBP    = _diaBP    = d.diastolicBP;
             _tPhysStat = _physStat = CalcPhysStat(d.heartRate, d.spo2, d.systolicBP);
+
+            if (txtDiagnosis != null)
+            {
+                bool isHemo = d.caseType == CaseType.HemorragiaActiva;
+                txtDiagnosis.text  = isHemo ? "HEMORRAGIA ACTIVA" : "VIA AEREA BLOQUEADA";
+                txtDiagnosis.color = isHemo
+                    ? new Color(0.95f, 0.25f, 0.25f, 1f)
+                    : new Color(0.25f, 0.60f, 1.00f, 1f);
+            }
         }
         else
         {
