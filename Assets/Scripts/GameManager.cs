@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public PatientController patient;
     public GameTimer gameTimer;
     public MessageController messageController;
+    public InjuryMarkerController injuryMarkerController;
+    public ClockCountdown clockCountdown;
 
     [Header("UI References")]
     public GameObject diagnosticScreen;
@@ -44,9 +46,11 @@ public class GameManager : MonoBehaviour
         if (patient == null) patient = FindObjectOfType<PatientController>();
         if (gameTimer == null) gameTimer = FindObjectOfType<GameTimer>();
         if (messageController == null) messageController = FindObjectOfType<MessageController>();
+        if (injuryMarkerController == null) injuryMarkerController = FindObjectOfType<InjuryMarkerController>();
+        if (clockCountdown == null) clockCountdown = FindObjectOfType<ClockCountdown>();
     }
 
-void Start()
+    void Start()
     {
         if (fsm == null) return;
 
@@ -59,6 +63,10 @@ void Start()
         if (diagnosticScreen != null) diagnosticScreen.SetActive(false);
         if (toolSelectionPanel != null) toolSelectionPanel.SetActive(false);
         if (resultsPanel != null) resultsPanel.SetActive(false);
+
+        // Auto-start when arriving from the full selection flow
+        if (PatientCaseManager.Instance != null && PatientCaseManager.Instance.ReadyToSimulate())
+            StartSimulation();
     }
 
     public void StartSimulation()
@@ -75,13 +83,31 @@ void Start()
 
         fsm.StartSimulation();
 
+        // Activar marker DESPUÉS de que el FSM fijó el estado inicial
+        if (injuryMarkerController != null)
+            injuryMarkerController.Initialize();
+
         if (gameTimer != null)
             gameTimer.StartTimer();
+
+        if (clockCountdown != null)
+        {
+            clockCountdown.OnTimeUp += OnClockTimeUp;
+            clockCountdown.StartCountdown();
+        }
 
         simulationStarted = true;
 
         if (messageController != null)
-            messageController.ShowInfo("Use Bisturi o Tijeras de Trauma para exponer la herida");
+            messageController.ShowInfo(fsm.CurrentState?.description ?? "Intervención iniciada.");
+    }
+
+    void OnClockTimeUp()
+    {
+        if (clockCountdown != null)
+            clockCountdown.OnTimeUp -= OnClockTimeUp;
+        if (fsm != null)
+            fsm.HandleGlobalTimeout();
     }
 
 public float GetElapsedTime()
@@ -121,6 +147,10 @@ public float GetElapsedTime()
 
         if (messageController != null)
             messageController.ShowInfo(state.description);
+
+        // Cardiac arrest: switch injury markers to muslo + torax
+        if (stateId == "PARO_EPINEFRINA" && injuryMarkerController != null)
+            injuryMarkerController.ShowCardiacMarkers();
 
         if (alarmAudioSource != null)
         {
@@ -174,9 +204,14 @@ public float GetElapsedTime()
         }
     }
 
-void OnSimulationEnd(bool success)
+    void OnSimulationEnd(bool success)
     {
         if (gameTimer != null) gameTimer.StopTimer();
+        if (clockCountdown != null)
+        {
+            clockCountdown.StopCountdown();
+            clockCountdown.OnTimeUp -= OnClockTimeUp;
+        }
 
         if (messageController != null)
         {

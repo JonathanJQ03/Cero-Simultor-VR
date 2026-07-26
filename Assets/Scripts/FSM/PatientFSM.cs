@@ -77,14 +77,14 @@ public class PatientFSM : MonoBehaviour
             displayName: "Limpieza",
             condition: PatientCondition.HemorragiaActiva,
             description: "Use Vendas Hemostáticas o Gasas para limpiar la sangre",
-            timeLimitSeconds: 15f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "VendasHemo", "Gasas" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "VendasHemo", "ESPERANDO_TORNIQUETE" },
                 { "Gasas", "ESPERANDO_TORNIQUETE" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: "PARO_EPINEFRINA",
             criticalErrorTools: new List<string> { "Laringoscopio", "Desfibrilador" }
         );
@@ -95,13 +95,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Compresión",
             condition: PatientCondition.HemorragiaActiva,
             description: "Use Torniquete proximal a la herida para controlar hemorragia",
-            timeLimitSeconds: 20f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "Torniquete" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "Torniquete", "ESTABILIZADO" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: null,
             criticalErrorTools: null
         );
@@ -116,13 +116,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Vía Aérea Básica",
             condition: PatientCondition.ViaAereaBlockeada,
             description: "Use Cánula de Guedel para abrir la vía aérea",
-            timeLimitSeconds: 15f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "CanulaDeGuedel" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "CanulaDeGuedel", "ESPERANDO_LARINGOSCOPIO" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: "PARO_EPINEFRINA",
             criticalErrorTools: new List<string> { "Bisturi", "Desfibrilador" }
         );
@@ -133,13 +133,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Intubación",
             condition: PatientCondition.ViaAereaBlockeada,
             description: "Use Laringoscopio para asegurar la vía aérea e intubar",
-            timeLimitSeconds: 20f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "Laringoscopio" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "Laringoscopio", "ESTABILIZADO" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: "PARO_EPINEFRINA",
             criticalErrorTools: new List<string> { "Desfibrilador", "Torniquete" }
         );
@@ -153,13 +153,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Epinefrina",
             condition: PatientCondition.ParoCardiaco,
             description: "Administre Epinefrina para reanimar al paciente",
-            timeLimitSeconds: 10f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "Epinefrina" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "Epinefrina", "PARO_DESFIBRILADOR" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: "FALLECIDO",
             criticalErrorTools: new List<string> { "Desfibrilador" }
         );
@@ -170,13 +170,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Desfibrilación",
             condition: PatientCondition.ParoCardiaco,
             description: "Use Desfibrilador (dos manos, carga previa)",
-            timeLimitSeconds: 10f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "Desfibrilador" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "Desfibrilador", "RECUPERADO_PARO" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: null,
             criticalErrorTools: null
         );
@@ -187,13 +187,13 @@ public class PatientFSM : MonoBehaviour
             displayName: "Recuperación Post-Paro",
             condition: PatientCondition.HemorragiaActiva,
             description: "Paciente reanimado. Aplique torniquete para controlar hemorragia.",
-            timeLimitSeconds: 15f,
+            timeLimitSeconds: 0,
             allowedTools: new List<string> { "Torniquete" },
             toolTransitions: new Dictionary<string, string>
             {
                 { "Torniquete", "ESTABILIZADO" }
             },
-            timeoutTransition: "FALLECIDO",
+            timeoutTransition: null,
             criticalErrorTransition: null,
             criticalErrorTools: null
         );
@@ -328,6 +328,13 @@ public class PatientFSM : MonoBehaviour
             IsSuccess = false;
             OnSimulationEnd?.Invoke(false);
         }
+    }
+
+    public void HandleGlobalTimeout()
+    {
+        if (IsFinished) return;
+        OnTimeout?.Invoke("GLOBAL");
+        TransitionTo("FALLECIDO");
     }
 
     public PatientState GetState(string id)

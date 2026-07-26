@@ -2,10 +2,13 @@ using UnityEngine;
 
 public enum CaseType { HemorragiaActiva, ViaAereaBlockeada }
 
+public enum InjuryLocation { Boca, BrazoIzq, BrazoDer, PiernaIzq, PiernaDer, Torax, Muslo }
+
 [System.Serializable]
 public class PatientData
 {
     public CaseType caseType;
+    public InjuryLocation injuryLocation;
 
     // Vitals
     public int heartRate;
@@ -136,6 +139,11 @@ public class PatientCaseManager : MonoBehaviour
         d.shockLabel = d.shockLevel == 3 ? "SEVERO" : "MODERADO";
         d.shockColor = d.shockLevel == 3 ? colorCritical : colorWarning;
 
+        // Random injury location: arm or leg, left or right
+        InjuryLocation[] hemLocs = { InjuryLocation.BrazoIzq, InjuryLocation.BrazoDer,
+                                     InjuryLocation.PiernaIzq, InjuryLocation.PiernaDer };
+        d.injuryLocation = hemLocs[Random.Range(0, hemLocs.Length)];
+
         int idx = Random.Range(0, causeHemorragia.Length);
         d.cause   = causeHemorragia[idx];
         d.finding = findingHemorragia[idx];
@@ -164,6 +172,8 @@ public class PatientCaseManager : MonoBehaviour
         d.shockLevel = Random.Range(1, 3);
         d.shockLabel = d.shockLevel == 2 ? "MODERADO" : "LEVE";
         d.shockColor = d.shockLevel == 2 ? colorWarning : colorNormal;
+
+        d.injuryLocation = InjuryLocation.Boca;
 
         int idx = Random.Range(0, causeViaAerea.Length);
         d.cause   = causeViaAerea[idx];

@@ -8,6 +8,8 @@ public class MedicalTool : MonoBehaviour
     public MedicalToolTag toolTag;
     public bool requireTwoHands;
 
+    public bool IsHeld { get; private set; }
+
     private XRGrabInteractable grabInteractable;
     private MeshRenderer[] meshRenderers;
     private Color originalColor;
@@ -53,11 +55,13 @@ public class MedicalTool : MonoBehaviour
 
     void OnGrabbed(SelectEnterEventArgs args)
     {
+        IsHeld = true;
         Highlight(true);
     }
 
     void OnReleased(SelectExitEventArgs args)
     {
+        IsHeld = false;
         Highlight(false);
     }
 
