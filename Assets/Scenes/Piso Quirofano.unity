@@ -6522,6 +6522,7 @@ GameObject:
   - component: {fileID: 1171576031}
   - component: {fileID: 1171576033}
   - component: {fileID: 1171576034}
+  - component: {fileID: 1171576035}
   m_Layer: 0
   m_Name: _GameManagers
   m_TagString: Untagged
@@ -6655,6 +6656,23 @@ MonoBehaviour:
   pulseSpeed: 2
   pulseMin: 0.85
   pulseMax: 1.15
+--- !u!114 &1171576035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171576027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1711986d715ee124b805dd334e434255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRFeedbackPopup
+  displayDuration: 2.5
+  fadeDuration: 0.35
+  correctColor: {r: 0.1, g: 0.72, b: 0.2, a: 0.95}
+  wrongColor: {r: 0.8, g: 0.1, b: 0.1, a: 0.95}
+  criticalColor: {r: 0.85, g: 0.4, b: 0, a: 0.95}
 --- !u!1 &1174605185
 GameObject:
   m_ObjectHideFlags: 0
