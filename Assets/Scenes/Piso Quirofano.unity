@@ -6523,6 +6523,7 @@ GameObject:
   - component: {fileID: 1171576033}
   - component: {fileID: 1171576034}
   - component: {fileID: 1171576035}
+  - component: {fileID: 1171576036}
   m_Layer: 0
   m_Name: _GameManagers
   m_TagString: Untagged
@@ -6673,6 +6674,29 @@ MonoBehaviour:
   correctColor: {r: 0.1, g: 0.72, b: 0.2, a: 0.95}
   wrongColor: {r: 0.8, g: 0.1, b: 0.1, a: 0.95}
   criticalColor: {r: 0.85, g: 0.4, b: 0, a: 0.95}
+  winColor: {r: 0.05, g: 0.55, b: 0.85, a: 0.97}
+  loseColor: {r: 0.3, g: 0, b: 0, a: 0.97}
+  infoColor: {r: 0.2, g: 0.2, b: 0.6, a: 0.95}
+--- !u!114 &1171576036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171576027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e56fe6e900b578a4fb33fd3e027044dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResultsController
+  titleText: {fileID: 0}
+  subtitleText: {fileID: 0}
+  statsText: {fileID: 0}
+  feedbackText: {fileID: 0}
+  btnReiniciar: {fileID: 0}
+  btnMenu: {fileID: 0}
+  successColor: {r: 0, g: 1, b: 0.25, a: 1}
+  failureColor: {r: 0.55, g: 0, b: 0, a: 1}
 --- !u!1 &1174605185
 GameObject:
   m_ObjectHideFlags: 0

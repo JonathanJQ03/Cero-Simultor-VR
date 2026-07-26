@@ -121,14 +121,8 @@ public static class PisoQuirofanoSetup
         tMgr.btnIngresarLabel = bIng.GetComponentInChildren<TextMeshProUGUI>();
 
         // ===== PANEL 4: RESULTADO =====
+        // ResultsController lives on _GameManagers and builds its own overlay canvas procedurally.
         var p4 = MakePanel("Panel_Resultado", cGO.transform, col_bg, false);
-        var resCtrl = p4.AddComponent<ResultsController>();
-        resCtrl.titleText = MakeTMP("Titulo_Resultado", p4.transform, "RESULTADO", 84, col_green, 0.10f, 0.72f, 0.90f, 0.92f);
-        resCtrl.subtitleText = MakeTMP("Subtitulo_Resultado", p4.transform, "", 32, Color.white, 0.10f, 0.58f, 0.90f, 0.71f);
-        resCtrl.statsText = MakeTMP("Stats_Resultado", p4.transform, "", 30, new Color(0.8f, 0.8f, 0.8f), 0.10f, 0.44f, 0.90f, 0.57f);
-        resCtrl.feedbackText = MakeTMP("Feedback_Resultado", p4.transform, "", 26, new Color(0.6f, 0.8f, 0.6f), 0.10f, 0.30f, 0.90f, 0.43f);
-        resCtrl.btnReiniciar = MakeButton("Btn_Reintentar", p4.transform, "REINTENTAR", 0.12f, 0.10f, 0.42f, 0.22f, new Color(0.08f, 0.35f, 0.18f), 38);
-        resCtrl.btnMenu = MakeButton("Btn_Menu", p4.transform, "MENU PRINCIPAL", 0.58f, 0.10f, 0.88f, 0.22f, new Color(0.12f, 0.18f, 0.32f), 38);
 
         // Wire GameFlowController
         flow.panelEscenaAccidente = p1;
