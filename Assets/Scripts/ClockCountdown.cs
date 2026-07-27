@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ClockCountdown : MonoBehaviour
 {
+    public static ClockCountdown Instance { get; private set; }
+
     [SerializeField] private float totalSeconds = 300f;
 
     public event System.Action OnTimeUp;
@@ -13,6 +15,32 @@ public class ClockCountdown : MonoBehaviour
     private float remainingTime;
     private bool  _running;
     private TextMesh textMesh;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    // ViaAerea: paciente entra en paro → baja a 1 min si estaba por encima
+    public void AjustarParaParo()
+    {
+        if (remainingTime > 60f)
+        {
+            remainingTime = 60f;
+            UpdateDisplay();
+        }
+    }
+
+    // ViaAerea: paciente sale del paro → sube a 3 min si estaba por debajo
+    public void AjustarParaRecuperacion()
+    {
+        if (remainingTime < 180f)
+        {
+            remainingTime = 180f;
+            if (!_running) _running = true;
+            UpdateDisplay();
+        }
+    }
 
     void Start()
     {

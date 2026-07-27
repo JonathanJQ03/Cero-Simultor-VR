@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/ReportePaciente.unity
     guid: 983af0d716ec5af4388688737c6954ce
   - enabled: 1
+    path: Assets/Scenes/SeleccionDificultad.unity
+    guid: 412d4a5a2574d0a4b958527a49b22fdc
+  - enabled: 1
     path: Assets/Scenes/SeleccionHerramientas.unity
     guid: 12447d7b82dce464c8f221eeff06f4cc
   - enabled: 1

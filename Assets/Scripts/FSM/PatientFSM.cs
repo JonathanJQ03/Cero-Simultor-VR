@@ -329,16 +329,20 @@ public class PatientFSM : MonoBehaviour
             return;
         }
 
+        // Capture previous condition before the transition
+        PatientCondition? prevCondition = CurrentState?.condition;
+
         if (CurrentState != null)
-        {
             OnStateExit?.Invoke(CurrentState.id);
-        }
 
         CurrentState = states[stateId];
         CurrentCondition = CurrentState.condition;
         TimeInState = 0;
 
         OnStateEnter?.Invoke(CurrentState.id);
+
+        // Timer mechanic: ViaAerea + paro cardiaco
+        ApplyParoCardiacoTimerAdjustment(prevCondition, CurrentCondition);
 
         if (CurrentState.condition == PatientCondition.Estabilizado)
         {
@@ -352,6 +356,26 @@ public class PatientFSM : MonoBehaviour
             IsSuccess = false;
             OnSimulationEnd?.Invoke(false);
         }
+    }
+
+    void ApplyParoCardiacoTimerAdjustment(PatientCondition? prev, PatientCondition next)
+    {
+        if (PatientCaseManager.Instance?.CurrentCase?.caseType != CaseType.ViaAereaBlockeada)
+            return;
+
+        var clock = ClockCountdown.Instance;
+        if (clock == null) return;
+
+        bool entrandoParo    = next == PatientCondition.ParoCardiaco
+                               && prev != PatientCondition.ParoCardiaco;
+        bool saliendoParo    = prev == PatientCondition.ParoCardiaco
+                               && next != PatientCondition.ParoCardiaco
+                               && next != PatientCondition.Fallecido;
+
+        if (entrandoParo)
+            clock.AjustarParaParo();
+        else if (saliendoParo)
+            clock.AjustarParaRecuperacion();
     }
 
     public void HandleGlobalTimeout()
