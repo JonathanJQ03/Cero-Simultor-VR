@@ -36,6 +36,10 @@ public class InjuryZone : MonoBehaviour
     {
         EnsureOverlay();
 
+        // Respetar dificultad configurada por el jugador
+        GameSettingsManager.EnsureExists();
+        countdownSeconds = GameSettingsManager.CountdownSeconds;
+
         _tickSrc              = gameObject.AddComponent<AudioSource>();
         _tickSrc.spatialBlend = 0f;
         _tickSrc.playOnAwake  = false;

@@ -49,7 +49,13 @@ public class MenuMusicAmbient : MonoBehaviour
         }
     }
 
-    void Start() => _src.Play();
+    void Start()
+    {
+        GameSettingsManager.EnsureExists();
+        _src.volume = volume * GameSettingsManager.MusicVolume;
+        GameSettingsManager.OnMusicVolumeChanged += v => _src.volume = volume * v;
+        _src.Play();
+    }
 
     // Pad suave en Do mayor (Do4-Mi4-Sol4-Do5) con respiración lenta
     AudioClip GeneratePad()

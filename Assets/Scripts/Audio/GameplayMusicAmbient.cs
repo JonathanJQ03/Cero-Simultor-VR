@@ -21,7 +21,13 @@ public class GameplayMusicAmbient : MonoBehaviour
         _src.clip         = GenerateDronePad();
     }
 
-    void Start() => _src.Play();
+    void Start()
+    {
+        GameSettingsManager.EnsureExists();
+        _src.volume = musicVolume * GameSettingsManager.MusicVolume;
+        GameSettingsManager.OnMusicVolumeChanged += v => _src.volume = musicVolume * v;
+        _src.Play();
+    }
 
     // Drone pad clínico: quinta perfecta + LFO lento + shimmer
     AudioClip GenerateDronePad()
