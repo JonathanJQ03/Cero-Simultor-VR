@@ -14,6 +14,6 @@ public class EscenaAccidenteController : MonoBehaviour
 
     public void BtnSiguiente()
     {
-        SceneManager.LoadScene("ReportePaciente");
+        SceneManager.LoadScene("SeleccionDificultad");
     }
 }

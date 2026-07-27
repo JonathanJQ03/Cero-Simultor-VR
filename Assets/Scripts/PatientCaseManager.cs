@@ -106,6 +106,26 @@ public class PatientCaseManager : MonoBehaviour
         GenerateNewCase();
     }
 
+    // Genera un caso con el tipo de caso forzado (usado por SeleccionDificultad)
+    public void GenerateCaseForType(CaseType forcedType)
+    {
+        SelectedTools.Clear();
+        var data = new PatientData();
+        data.caseType = forcedType;
+
+        data.age    = Random.Range(20, 62);
+        data.sex    = Random.value > 0.4f ? "M" : "F";
+        data.weight = Random.Range(55, 96);
+        data.patientNumber = Random.Range(1, 100);
+
+        if (forcedType == CaseType.HemorragiaActiva)
+            FillHemorragiaVitals(data);
+        else
+            FillViaAereaVitals(data);
+
+        CurrentCase = data;
+    }
+
     public void GenerateNewCase()
     {
         SelectedTools.Clear();
