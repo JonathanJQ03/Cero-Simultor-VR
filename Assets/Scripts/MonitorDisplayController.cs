@@ -1,9 +1,20 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 public class MonitorDisplayController : MonoBehaviour
 {
+    [Header("Status Color (borde + header)")]
+    public Image diagnosisBg;
+    public Image borderTop;
+    public Image borderBottom;
+    public Image borderLeft;
+    public Image borderRight;
+
+    [Header("Paro Cardíaco Overlay")]
+    public Image paroFlashOverlay;
+
     // ── ECG ─────────────────────────────────────────────────────────────
     [Header("ECG")]
     public RawImage          ecgWaveImage;
@@ -52,10 +63,15 @@ public class MonitorDisplayController : MonoBehaviour
     static readonly Color32 C_BG     = new Color32(0,   0,   0,   255);
 
     PatientFSM _fsm;
+    Coroutine  _paroFlash;
+    bool       _isParoCardiaco;
+    bool       _isFlatline;
 
     // ────────────────────────────────────────────────────────────────────
     void Start()
     {
+        if (paroFlashOverlay != null) paroFlashOverlay.color = new Color(1,0,0,0);
+        SetStatusColor(S_YELLOW);
         InitVitalsFromCase();
         BuildWaveformTextures();
         SubscribeFSM();
@@ -66,8 +82,11 @@ public class MonitorDisplayController : MonoBehaviour
     {
         if (_fsm != null)
         {
-            _fsm.OnCorrectTool -= HandleCorrectTool;
-            _fsm.OnWrongTool   -= HandleWrongTool;
+            _fsm.OnCorrectTool  -= HandleCorrectTool;
+            _fsm.OnWrongTool    -= HandleWrongTool;
+            _fsm.OnStateEnter   -= HandleStateEnter;
+            _fsm.OnCriticalError -= HandleCriticalError;
+            _fsm.OnSimulationEnd -= HandleSimulationEnd;
         }
     }
 
@@ -118,9 +137,120 @@ public class MonitorDisplayController : MonoBehaviour
         _fsm = FindObjectOfType<PatientFSM>();
         if (_fsm != null)
         {
-            _fsm.OnCorrectTool += HandleCorrectTool;
-            _fsm.OnWrongTool   += HandleWrongTool;
+            _fsm.OnCorrectTool   += HandleCorrectTool;
+            _fsm.OnWrongTool     += HandleWrongTool;
+            _fsm.OnStateEnter    += HandleStateEnter;
+            _fsm.OnCriticalError += HandleCriticalError;
+            _fsm.OnSimulationEnd += HandleSimulationEnd;
         }
+    }
+
+    // ── Nuevos handlers de estado ─────────────────────────────────────────
+    // Colores de estado del monitor
+    static readonly Color S_GREEN  = new Color(0.10f, 0.85f, 0.30f, 1f);
+    static readonly Color S_YELLOW = new Color(0.95f, 0.75f, 0.05f, 1f);
+    static readonly Color S_RED    = new Color(0.90f, 0.10f, 0.10f, 1f);
+    static readonly Color S_DARK   = new Color(0.20f, 0.02f, 0.02f, 1f);
+
+    void SetStatusColor(Color color)
+    {
+        Color dimBg = new Color(color.r * 0.25f, color.g * 0.25f, color.b * 0.25f, 0.85f);
+        if (diagnosisBg) diagnosisBg.color = dimBg;
+        if (borderTop)    borderTop.color    = color;
+        if (borderBottom) borderBottom.color = color;
+        if (borderLeft)   borderLeft.color   = color;
+        if (borderRight)  borderRight.color  = color;
+    }
+
+    void HandleStateEnter(string stateId)
+    {
+        switch (stateId)
+        {
+            case "ESPERANDO_BISTURI":
+            case "ESPERANDO_GASAS":
+            case "ESPERANDO_TORNIQUETE":
+            case "ESPERANDO_CANULA":
+            case "ESPERANDO_LARINGOSCOPIO":
+                SetStatusColor(S_YELLOW);
+                break;
+            case "PARO_EPINEFRINA":
+            case "PARO_DESFIBRILADOR":
+                SetStatusColor(S_RED);
+                EnterParoCardiaco();
+                break;
+            case "RECUPERADO_PARO":
+                SetStatusColor(S_YELLOW);
+                ExitParoCardiaco();
+                Shift(hrDelta: +55f, spo2Delta: +28f, sysDelta: +47f, diaDelta: +32f, physDelta: +25f);
+                break;
+            case "ESTABILIZADO":
+                SetStatusColor(S_GREEN);
+                ExitParoCardiaco();
+                _tHR = 72f; _tSpo2 = 98f; _tSysBP = 115f; _tDiaBP = 75f; _tPhysStat = 92f;
+                break;
+            case "FALLECIDO":
+                SetStatusColor(S_DARK);
+                ExitParoCardiaco();
+                _isFlatline = true;
+                _tHR = 0f; _tSpo2 = 0f; _tSysBP = 0f; _tDiaBP = 0f; _tPhysStat = 0f;
+                break;
+        }
+    }
+
+    void HandleCriticalError(string toolId)
+    {
+        EnterParoCardiaco();
+    }
+
+    void HandleSimulationEnd(bool success)
+    {
+        ExitParoCardiaco();
+    }
+
+    void EnterParoCardiaco()
+    {
+        if (_isParoCardiaco) return;
+        _isParoCardiaco = true;
+        _tHR = 32f; _tSpo2 = 62f; _tSysBP = 46f; _tDiaBP = 28f;
+        if (txtDiagnosis != null)
+        {
+            txtDiagnosis.text  = "PARO CARDÍACO";
+            txtDiagnosis.color = new Color(1f, 0.15f, 0.15f, 1f);
+        }
+        if (_paroFlash != null) StopCoroutine(_paroFlash);
+        _paroFlash = StartCoroutine(ParoFlashRoutine());
+    }
+
+    void ExitParoCardiaco()
+    {
+        _isParoCardiaco = false;
+        _isFlatline     = false;
+        if (_paroFlash != null) { StopCoroutine(_paroFlash); _paroFlash = null; }
+        if (paroFlashOverlay != null) paroFlashOverlay.color = new Color(1,0,0,0);
+    }
+
+    IEnumerator ParoFlashRoutine()
+    {
+        while (_isParoCardiaco)
+        {
+            if (paroFlashOverlay != null)
+            {
+                // Fade rojo in
+                for (float t = 0; t < 0.3f; t += Time.deltaTime)
+                {
+                    paroFlashOverlay.color = new Color(1, 0, 0, Mathf.Lerp(0, 0.35f, t / 0.3f));
+                    yield return null;
+                }
+                // Fade rojo out
+                for (float t = 0; t < 0.5f; t += Time.deltaTime)
+                {
+                    paroFlashOverlay.color = new Color(1, 0, 0, Mathf.Lerp(0.35f, 0, t / 0.5f));
+                    yield return null;
+                }
+            }
+            yield return new WaitForSeconds(0.6f);
+        }
+        if (paroFlashOverlay != null) paroFlashOverlay.color = new Color(1,0,0,0);
     }
 
     void ApplyImmediate()
@@ -304,8 +434,21 @@ public class MonitorDisplayController : MonoBehaviour
 
     void ScrollWaves()
     {
+        if (_isFlatline)
+        {
+            // Línea recta — mostrar textura estática sin scroll o scroll muy lento
+            float deadSpeed = 0.04f;
+            _ecgUV  = (_ecgUV  + deadSpeed * Time.deltaTime) % 1f;
+            _spo2UV = (_spo2UV + deadSpeed * Time.deltaTime) % 1f;
+            if (ecgWaveImage)  ecgWaveImage.uvRect  = new Rect(_ecgUV, 0.45f, 1, 0.02f); // franja plana
+            if (spo2WaveImage) spo2WaveImage.uvRect = new Rect(_spo2UV,0.47f, 1, 0.02f);
+            return;
+        }
+
         float hrNorm   = Mathf.Clamp01((_hr - 40f) / 160f);
-        float ecgSpeed = Mathf.Lerp(0.25f, 1.1f, hrNorm);
+        float ecgSpeed = _isParoCardiaco
+            ? Mathf.Lerp(0.08f, 0.18f, hrNorm)   // muy lento en paro
+            : Mathf.Lerp(0.25f, 1.10f, hrNorm);
         _ecgUV  = (_ecgUV  + ecgSpeed        * Time.deltaTime) % 1f;
         _spo2UV = (_spo2UV + ecgSpeed * 0.55f * Time.deltaTime) % 1f;
         if (ecgWaveImage)  ecgWaveImage.uvRect  = new Rect(_ecgUV,  0, 1, 1);
