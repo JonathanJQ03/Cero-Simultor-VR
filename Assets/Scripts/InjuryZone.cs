@@ -15,6 +15,9 @@ public class InjuryZone : MonoBehaviour
     Coroutine      _countdown;
     MedicalTool    _currentTool;
 
+    AudioSource _tickSrc;
+    AudioClip   _tickClip;
+
     // Overlay compartido entre todas las InjuryZones (static)
     static CanvasGroup     _cg;
     static TextMeshProUGUI _label;
@@ -32,6 +35,12 @@ public class InjuryZone : MonoBehaviour
     void Start()
     {
         EnsureOverlay();
+
+        _tickSrc              = gameObject.AddComponent<AudioSource>();
+        _tickSrc.spatialBlend = 0f;
+        _tickSrc.playOnAwake  = false;
+        _tickSrc.priority     = 100;
+        _tickClip             = GenerateTick();
     }
 
     // ── Overlay ScreenSpaceOverlay (sortingOrder 98, debajo de VRFeedbackPopup/ResultsController)
@@ -132,6 +141,12 @@ public class InjuryZone : MonoBehaviour
         {
             if (!tool.IsHeld) { CancelCountdown(); yield break; }
             ShowOverlay($"Interviniendo... {i}", colorIntervene);
+            // Tick con pitch creciente: empieza normal, sube conforme queda menos tiempo
+            if (_tickSrc != null && _tickClip != null)
+            {
+                _tickSrc.pitch = 1f + (countdownSeconds - i) * 0.15f;
+                _tickSrc.PlayOneShot(_tickClip, 0.65f);
+            }
             yield return new WaitForSeconds(1f);
         }
 
@@ -164,5 +179,32 @@ public class InjuryZone : MonoBehaviour
     {
         if (_cg == null) return;
         _cg.alpha = 0f;
+    }
+
+    // Tick clínico: tono corto con decaimiento rápido (el pitch se ajusta desde fuera)
+    static AudioClip GenerateTick()
+    {
+        const int SR  = 44100;
+        float     dur = 0.07f;
+        int       n   = Mathf.RoundToInt(SR * dur);
+        float[]   d   = new float[n];
+        var rng = new System.Random(17);
+
+        for (int i = 0; i < n; i++)
+        {
+            float t     = i / (float)SR;
+            float tNorm = i / (float)n;
+            float env   = Mathf.Exp(-tNorm * 22f);
+            float noise = (float)(rng.NextDouble() * 2 - 1) * 0.12f;
+            d[i] = (Mathf.Sin(2f * Mathf.PI * 1050f * t) * 0.75f + noise) * env;
+        }
+
+        float peak = 0f;
+        foreach (float s in d) { float a = Mathf.Abs(s); if (a > peak) peak = a; }
+        if (peak > 0.001f) for (int i = 0; i < n; i++) d[i] = d[i] / peak * 0.90f;
+
+        var c = AudioClip.Create("InjuryTick", n, 1, SR, false);
+        c.SetData(d, 0);
+        return c;
     }
 }
