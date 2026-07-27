@@ -182,21 +182,45 @@ public class PatientFSM : MonoBehaviour
         );
         states[paroE.id] = paroE;
 
-        var recuperado = new PatientState(
-            id: "RECUPERADO_PARO",
-            displayName: "Recuperación Post-Paro",
-            condition: PatientCondition.HemorragiaActiva,
-            description: "Paciente reanimado. Aplique torniquete para controlar hemorragia.",
-            timeLimitSeconds: 0,
-            allowedTools: new List<string> { "Torniquete" },
-            toolTransitions: new Dictionary<string, string>
-            {
-                { "Torniquete", "ESTABILIZADO" }
-            },
-            timeoutTransition: null,
-            criticalErrorTransition: null,
-            criticalErrorTools: null
-        );
+        bool esViaAerea = PatientCaseManager.Instance?.CurrentCase?.caseType == CaseType.ViaAereaBlockeada;
+
+        PatientState recuperado;
+        if (esViaAerea)
+        {
+            recuperado = new PatientState(
+                id: "RECUPERADO_PARO",
+                displayName: "Recuperación Post-Paro",
+                condition: PatientCondition.ViaAereaBlockeada,
+                description: "Paciente reanimado. Continúe con la vía aérea — use Cánula de Guedel.",
+                timeLimitSeconds: 0,
+                allowedTools: new List<string> { "CanulaDeGuedel" },
+                toolTransitions: new Dictionary<string, string>
+                {
+                    { "CanulaDeGuedel", "ESPERANDO_LARINGOSCOPIO" }
+                },
+                timeoutTransition: null,
+                criticalErrorTransition: null,
+                criticalErrorTools: null
+            );
+        }
+        else
+        {
+            recuperado = new PatientState(
+                id: "RECUPERADO_PARO",
+                displayName: "Recuperación Post-Paro",
+                condition: PatientCondition.HemorragiaActiva,
+                description: "Paciente reanimado. Aplique torniquete para controlar hemorragia.",
+                timeLimitSeconds: 0,
+                allowedTools: new List<string> { "Torniquete" },
+                toolTransitions: new Dictionary<string, string>
+                {
+                    { "Torniquete", "ESTABILIZADO" }
+                },
+                timeoutTransition: null,
+                criticalErrorTransition: null,
+                criticalErrorTools: null
+            );
+        }
         states[recuperado.id] = recuperado;
     }
 

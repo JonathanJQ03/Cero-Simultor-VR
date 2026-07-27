@@ -252,8 +252,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.9, g: 0.14999998, b: 0.14999998, a: 0.34117648}
-    - _Color: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.34117648}
+    - _BaseColor: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.19607843}
+    - _Color: {r: 0.9, g: 0.14999992, b: 0.14999992, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -378,8 +378,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.9, g: 0.14999998, b: 0.14999998, a: 0.34117648}
-    - _Color: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.34117648}
+    - _BaseColor: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.19607843}
+    - _Color: {r: 0.9, g: 0.14999992, b: 0.14999992, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -1965,7 +1965,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.881, y: 1.18, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2089553308}
@@ -2039,7 +2039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 021be33be596af340bee16054342cdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
-  triggerRadius: 0.15
+  triggerRadius: 0.8
   countdownSeconds: 5
   retireMessageDelay: 2
 --- !u!135 &469003929
@@ -2061,7 +2061,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.8
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &469003930
 Rigidbody:
@@ -2300,8 +2300,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.9, g: 0.14999998, b: 0.14999998, a: 0.34117648}
-    - _Color: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.34117648}
+    - _BaseColor: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.19607843}
+    - _Color: {r: 0.9, g: 0.14999992, b: 0.14999992, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -2747,6 +2747,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec93d56155e5ab84b89bea40c23c5dc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonitorDisplayController
+  diagnosisBg: {fileID: 0}
+  borderTop: {fileID: 0}
+  borderBottom: {fileID: 0}
+  borderLeft: {fileID: 0}
+  borderRight: {fileID: 0}
+  paroFlashOverlay: {fileID: 0}
   ecgWaveImage: {fileID: 994663736}
   txtHeartRate: {fileID: 2114546968}
   txtBpmLabel: {fileID: 0}
@@ -2818,6 +2824,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dfc6c3ceaa89f784684ed70bf974cdee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dfc6c3ceaa89f784684ed70bf974cdee, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: dfc6c3ceaa89f784684ed70bf974cdee, type: 3}
@@ -3446,7 +3456,7 @@ Transform:
   m_GameObject: {fileID: 741501819}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -1, y: 0.49, z: 2.36}
+  m_LocalPosition: {x: -1, y: 1, z: 2.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4842,8 +4852,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.95, g: 0.65, b: 0.049999982, a: 0.34117648}
-    - _Color: {r: 0.95, g: 0.65, b: 0.049999967, a: 0.34117648}
+    - _BaseColor: {r: 0.95, g: 0.65, b: 0.049999967, a: 0.19607843}
+    - _Color: {r: 0.95, g: 0.65, b: 0.049999952, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -5890,8 +5900,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.95, g: 0.65, b: 0.049999982, a: 0.34117648}
-    - _Color: {r: 0.95, g: 0.65, b: 0.049999967, a: 0.34117648}
+    - _BaseColor: {r: 0.95, g: 0.65, b: 0.049999967, a: 0.19607843}
+    - _Color: {r: 0.95, g: 0.65, b: 0.049999952, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -6755,6 +6765,8 @@ MonoBehaviour:
   markerTorax: {fileID: 469003924}
   markerMuslo: {fileID: 1825125744}
   zoneRadius: 0.18
+  toraxZoneRadius: 0.8
+  musloZoneRadius: 0.5
   legacySocket: {fileID: 1514657041}
   pulseSpeed: 2
   pulseMin: 0.85
@@ -7515,8 +7527,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.9, g: 0.14999998, b: 0.14999998, a: 0.34117648}
-    - _Color: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.34117648}
+    - _BaseColor: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.19607843}
+    - _Color: {r: 0.9, g: 0.14999992, b: 0.14999992, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -8391,8 +8403,8 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.9, g: 0.14999998, b: 0.14999998, a: 0.34117648}
-    - _Color: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.34117648}
+    - _BaseColor: {r: 0.9, g: 0.14999995, b: 0.14999995, a: 0.19607843}
+    - _Color: {r: 0.9, g: 0.14999992, b: 0.14999992, a: 0.19607843}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
@@ -9444,7 +9456,7 @@ Transform:
   m_GameObject: {fileID: 1624865024}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: -1.95, y: -0.47759998, z: 5.038}
+  m_LocalPosition: {x: -1.95, y: 0.1324, z: 5.038}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11089,15 +11101,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792063661}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.105710305, y: -0.7813005, z: 0.13776435, w: -0.599513}
-  m_LocalPosition: {x: 1.0500002, y: 0.13240004, z: 3.01}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 1.0500002, y: 0.13240004, z: 5.038}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1662261292}
   - {fileID: 1064966393}
   m_Father: {fileID: 335645971}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &1792063663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11572,7 +11584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 021be33be596af340bee16054342cdde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InjuryZone
-  triggerRadius: 0.15
+  triggerRadius: 0.5
   countdownSeconds: 5
   retireMessageDelay: 2
 --- !u!135 &1825125749

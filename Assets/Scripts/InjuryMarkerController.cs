@@ -16,8 +16,12 @@ public class InjuryMarkerController : MonoBehaviour
     public GameObject markerMuslo;
 
     [Header("Zona de Interacción")]
-    [Tooltip("Radio del trigger en espacio local del marcador (0.5 = coincide con la esfera visual)")]
+    [Tooltip("Radio del trigger en espacio local (marcadores normales)")]
     public float zoneRadius = 0.5f;
+    [Tooltip("Radio del trigger para tórax (paro cardíaco)")]
+    public float toraxZoneRadius = 0.8f;
+    [Tooltip("Radio del trigger para muslo (paro cardíaco)")]
+    public float musloZoneRadius = 0.5f;
 
     [Tooltip("Socket fijo antiguo (blue rectangle) — se desactiva al iniciar")]
     public GameObject legacySocket;
@@ -34,29 +38,78 @@ public class InjuryMarkerController : MonoBehaviour
 
     void Awake()
     {
-        // Asegurar que cada marker tenga su InjuryZone (trigger esférico)
-        GameObject[] all = { markerBoca, markerBrazoIzq, markerBrazoDer,
-                              markerPiernaIzq, markerPiernaDer, markerTorax, markerMuslo };
-        foreach (var m in all)
-            EnsureInjuryZone(m);
+        GameObject[] normal = { markerBoca, markerBrazoIzq, markerBrazoDer,
+                                 markerPiernaIzq, markerPiernaDer };
+
+        foreach (var m in normal) EnsureInjuryZone(m, zoneRadius);
+        EnsureInjuryZone(markerTorax, toraxZoneRadius);
+        EnsureInjuryZone(markerMuslo, musloZoneRadius);
     }
 
-    void EnsureInjuryZone(GameObject marker)
+    void EnsureInjuryZone(GameObject marker, float radius)
     {
         if (marker == null) return;
-        if (marker.GetComponent<InjuryZone>() == null)
-            marker.AddComponent<InjuryZone>();
 
-        // Rigidbody cinemático necesario para que OnTriggerEnter detecte
-        // herramientas XR (que son cinemáticas mientras se sostienen).
-        // Sin esto: static trigger vs kinematic Rigidbody = sin evento.
+        var zone = marker.GetComponent<InjuryZone>();
+        if (zone == null) zone = marker.AddComponent<InjuryZone>();
+        zone.triggerRadius = radius;
+
         var rb = marker.GetComponent<Rigidbody>();
         if (rb == null) rb = marker.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         rb.useGravity  = false;
 
         var col = marker.GetComponent<SphereCollider>();
-        if (col != null) col.radius = zoneRadius;
+        if (col == null) col = marker.AddComponent<SphereCollider>();
+        col.isTrigger = true;
+        col.radius    = radius;
+    }
+
+    PatientFSM _fsm;
+
+    void Start()
+    {
+        _fsm = PatientFSM.Instance;
+        if (_fsm != null)
+            _fsm.OnStateEnter += HandleStateEnter;
+    }
+
+    void OnDestroy()
+    {
+        if (_fsm != null)
+            _fsm.OnStateEnter -= HandleStateEnter;
+    }
+
+    void HandleStateEnter(string stateId)
+    {
+        switch (stateId)
+        {
+            case "PARO_EPINEFRINA":
+            case "PARO_DESFIBRILADOR":
+                ShowCardiacMarkers();
+                break;
+
+            case "RECUPERADO_PARO":
+                // Volver al marcador del caso original después del paro
+                HideAll();
+                bool esViaAerea = PatientCaseManager.Instance?.CurrentCase?.caseType
+                                  == CaseType.ViaAereaBlockeada;
+                if (esViaAerea)
+                    Activate(markerBoca);          // zona roja en cabeza → Cánula
+                else
+                    Activate(markerMuslo);          // zona roja en muslo → Torniquete
+                break;
+
+            case "ESPERANDO_LARINGOSCOPIO":
+                // Después de Cánula: activar zona boca para Laringoscopio también
+                // (el marker ya estaba activo, solo lo refrescamos)
+                break;
+
+            case "ESTABILIZADO":
+            case "FALLECIDO":
+                HideAll();
+                break;
+        }
     }
 
     // Llamado por GameManager.StartSimulation()

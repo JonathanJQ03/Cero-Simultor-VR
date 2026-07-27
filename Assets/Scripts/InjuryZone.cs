@@ -144,6 +144,8 @@ public class InjuryZone : MonoBehaviour
         _countdown   = null;
         fsm.ProcessTool(toolId);
 
+        if (fsm.IsFinished) { HideOverlay(); yield break; }
+
         yield return new WaitForSeconds(retireMessageDelay);
         ShowOverlay("Retire la herramienta", colorRetire);
         yield return new WaitForSeconds(2.5f);
