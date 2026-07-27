@@ -27,9 +27,18 @@ public class GameTimer : MonoBehaviour
 
     public void StartTimer()
     {
-        startTime = Time.time;
+        // Si hay un SessionTimer activo (arrancado en ReportePaciente),
+        // usamos su tiempo restante y lo detenemos para que GameTimer tome el control.
+        var st = SessionTimer.Instance;
+        if (st != null && st.IsRunning && !st.Expired)
+        {
+            baseTimeSeconds = st.Remaining;
+            st.StopTimer();
+        }
+
+        startTime     = Time.time;
         remainingTime = baseTimeSeconds;
-        isRunning = true;
+        isRunning     = true;
     }
 
     public void StopTimer()

@@ -33,7 +33,16 @@ public class ClockCountdown : MonoBehaviour
 
     public void StartCountdown()
     {
-        remainingTime = totalSeconds;
+        var st = SessionTimer.Instance;
+        if (st != null && !st.Expired)
+        {
+            remainingTime = st.Remaining;
+            st.StopTimer();
+        }
+        else
+        {
+            remainingTime = totalSeconds;
+        }
         _running = true;
         UpdateDisplay();
     }

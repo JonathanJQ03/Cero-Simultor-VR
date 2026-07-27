@@ -27,10 +27,11 @@ public class ReportePacienteController : MonoBehaviour
     void Start()
     {
         if (PatientCaseManager.Instance == null)
-        {
-            // Fallback: create manager if not present (e.g. scene loaded directly in editor)
             new GameObject("PatientCaseManager").AddComponent<PatientCaseManager>();
-        }
+
+        // El timer de sesión comienza aquí: 5 minutos que se comparten con
+        // SeleccionHerramientas y luego con el Quirófano.
+        SessionTimer.EnsureExists().StartTimer();
 
         var d = PatientCaseManager.Instance.CurrentCase;
         ApplyVitals(d);

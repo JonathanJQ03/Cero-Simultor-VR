@@ -47,6 +47,22 @@ public class PatientCaseManager : MonoBehaviour
     public System.Collections.Generic.List<string> SelectedTools { get; private set; } = new System.Collections.Generic.List<string>();
     public const int RequiredToolCount = 5;
 
+    // Herramientas correctas por tipo de caso
+    public static readonly string[] HemorragiaTools =
+        { "Bisturi", "VendasHemo", "Torniquete", "Desfibrilador", "Epinefrina" };
+    public static readonly string[] ViaAereaTools =
+        { "CanulaDeGuedel", "Laringoscopio", "Epinefrina", "Desfibrilador", "Bisturi" };
+
+    public string[] CorrectTools =>
+        CurrentCase?.caseType == CaseType.ViaAereaBlockeada ? ViaAereaTools : HemorragiaTools;
+
+    public bool IsCorrectTool(string toolId)
+    {
+        foreach (var t in CorrectTools)
+            if (t == toolId) return true;
+        return false;
+    }
+
     public bool ToggleTool(string toolId)
     {
         if (SelectedTools.Contains(toolId)) { SelectedTools.Remove(toolId); return false; }
