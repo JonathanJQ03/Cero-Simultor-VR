@@ -3,44 +3,44 @@ using UnityEngine;
 public class QuirofanoAmbient : MonoBehaviour
 {
     [Header("Volúmenes")]
-    [Range(0f, 1f)] public float humVolume        = 0.15f;
-    [Range(0f, 1f)] public float ventilatorVolume = 0.02f;
-    [Range(0f, 1f)] public float hvacVolume       = 0.02f;
-    [Range(0f, 1f)] public float dripVolume       = 0.07f;
-    [Range(0f, 1f)] public float noiseVolume      = 0.15f;
+    [Range(0f, 1f)] public float ventilatorVolume    = 0.55f;  // respirador mecánico
+    [Range(0f, 1f)] public float suctionVolume       = 0.30f;  // aspirador quirúrgico
+    [Range(0f, 1f)] public float electrocauterVolume = 0.45f;  // electrocauterio (Bovie)
+    [Range(0f, 1f)] public float laminarVolume       = 0.08f;  // flujo laminar de sala
+    [Range(0f, 1f)] public float humVolume           = 0.18f;  // zumbido eléctrico
 
-    AudioSource _srcHum;
     AudioSource _srcVent;
-    AudioSource _srcHvac;
-    AudioSource _srcDrip;
-    AudioSource _srcNoise;
+    AudioSource _srcSuction;
+    AudioSource _srcCautery;
+    AudioSource _srcLaminar;
+    AudioSource _srcHum;
 
     const int   SR   = 22050;
-    // 12s: ventilador a 10 resp/min (periodo 6s) → 2 ciclos completos, loop limpio
-    const float LOOP = 12f;
+    // 24s: ventilador (6s x 4 ciclos) + electrocauterio suena ~1 vez cada 24s
+    const float LOOP = 24f;
 
     void Awake()
     {
-        _srcHum   = CreateSource("Hum",        humVolume);
-        _srcVent  = CreateSource("Ventilator", ventilatorVolume);
-        _srcHvac  = CreateSource("HVAC",       hvacVolume);
-        _srcDrip  = CreateSource("Drip",       dripVolume);
-        _srcNoise = CreateSource("Noise",      noiseVolume);
+        _srcVent    = CreateSource("Ventilator",     ventilatorVolume);
+        _srcSuction = CreateSource("Suction",        suctionVolume);
+        _srcCautery = CreateSource("Electrocautery", electrocauterVolume);
+        _srcLaminar = CreateSource("Laminar",        laminarVolume);
+        _srcHum     = CreateSource("Hum",            humVolume);
 
-        _srcHum.clip   = GenerateHum();
-        _srcVent.clip  = GenerateVentilator();
-        _srcHvac.clip  = GenerateHvac();
-        _srcDrip.clip  = GenerateDrip();
-        _srcNoise.clip = GenerateNoise();
+        _srcVent.clip    = GenerateVentilator();
+        _srcSuction.clip = GenerateSuction();
+        _srcCautery.clip = GenerateElectrocautery();
+        _srcLaminar.clip = GenerateLaminar();
+        _srcHum.clip     = GenerateHum();
     }
 
     void Start()
     {
-        _srcHum.Play();
         _srcVent.Play();
-        _srcHvac.Play();
-        _srcDrip.Play();
-        _srcNoise.Play();
+        _srcSuction.Play();
+        _srcCautery.Play();
+        _srcLaminar.Play();
+        _srcHum.Play();
     }
 
     AudioSource CreateSource(string label, float vol)
@@ -56,7 +56,153 @@ public class QuirofanoAmbient : MonoBehaviour
         return src;
     }
 
-    // Zumbido eléctrico: 60 Hz + armónicos (lámparas, equipos)
+    // Respirador mecánico: inhale (bomba activa, más agudo) vs exhale (pasivo, más grave)
+    // 10 resp/min → periodo 6s → 4 ciclos exactos en 24s (loop limpio)
+    AudioClip GenerateVentilator()
+    {
+        int    n      = Mathf.RoundToInt(SR * LOOP);
+        float[] d     = new float[n];
+        var rng       = new System.Random(99);
+        float prevLow = 0f, prevMid = 0f;
+
+        const float breathHz   = 10f / 60f;
+        const float inhaleFrac = 0.38f;
+
+        for (int i = 0; i < n; i++)
+        {
+            float t     = i / (float)SR;
+            float phase = (t * breathHz) % 1f;
+            float raw   = (float)(rng.NextDouble() * 2.0 - 1.0);
+
+            float sample;
+            if (phase < inhaleFrac)
+            {
+                float norm = phase / inhaleFrac;
+                float env  = norm < 0.15f ? norm / 0.15f : 1f - (norm - 0.15f) / 0.85f * 0.15f;
+                prevMid    = Mathf.Lerp(prevMid, raw, 0.055f);
+                float valve = norm < 0.03f ? Mathf.Sin(Mathf.PI * norm / 0.03f) * 0.18f : 0f;
+                sample = prevMid * (0.55f + env * 0.45f) + valve;
+            }
+            else
+            {
+                float norm = (phase - inhaleFrac) / (1f - inhaleFrac);
+                float env  = Mathf.Exp(-norm * 2.2f) * 0.6f + 0.4f;
+                prevLow    = Mathf.Lerp(prevLow, raw, 0.016f);
+                sample     = prevLow * env * 0.90f;
+            }
+
+            d[i] = sample * 0.72f;
+        }
+
+        int fade = Mathf.RoundToInt(SR * 0.05f);
+        for (int i = 0; i < fade; i++)
+        {
+            float t = i / (float)fade;
+            d[i]         *= t;
+            d[n - 1 - i] *= t;
+        }
+        return MakeClip("Ventilator", d);
+    }
+
+    // Aspirador/succión quirúrgica: motor + vacío alta frecuencia + burbujeo
+    AudioClip GenerateSuction()
+    {
+        int    n      = Mathf.RoundToInt(SR * LOOP);
+        float[] d     = new float[n];
+        var rng       = new System.Random(55);
+        float prevVac = 0f, prevGurg = 0f;
+
+        for (int i = 0; i < n; i++)
+        {
+            float t   = i / (float)SR;
+            float raw = (float)(rng.NextDouble() * 2.0 - 1.0);
+
+            float motor = Mathf.Sin(2f * Mathf.PI * 82f  * t) * 0.40f
+                        + Mathf.Sin(2f * Mathf.PI * 164f * t) * 0.18f
+                        + Mathf.Sin(2f * Mathf.PI * 246f * t) * 0.08f;
+
+            prevVac = Mathf.Lerp(prevVac, raw, 0.05f);
+            float vacuum = (raw - prevVac) * 0.28f;
+
+            prevGurg = Mathf.Lerp(prevGurg, raw, 0.007f);
+            float gurgleAM = 0.4f + 0.6f * Mathf.Abs(
+                Mathf.Sin(2f * Mathf.PI * 0.6f * t + Mathf.Sin(2f * Mathf.PI * 0.11f * t) * 4f));
+            float gurgle = prevGurg * gurgleAM * 0.35f;
+
+            d[i] = (motor * 0.40f + vacuum + gurgle) * 0.60f;
+        }
+        return MakeClip("Suction", d);
+    }
+
+    // Electrocauterio (Bovie): zumbido chirriante, 2 disparos por loop de 24s
+    AudioClip GenerateElectrocautery()
+    {
+        int    n  = Mathf.RoundToInt(SR * LOOP);
+        float[] d = new float[n];
+        var rng   = new System.Random(33);
+
+        AddBovie(d, rng, startSec: 5.0f,  durSec: 0.90f);
+        AddBovie(d, rng, startSec: 16.0f, durSec: 0.45f);
+
+        return MakeClip("Electrocautery", d);
+    }
+
+    void AddBovie(float[] d, System.Random rng, float startSec, float durSec)
+    {
+        int start = Mathf.RoundToInt(startSec * SR);
+        int len   = Mathf.RoundToInt(durSec   * SR);
+        if (start + len > d.Length) return;
+
+        for (int j = 0; j < len; j++)
+        {
+            float localT = j / (float)SR;
+            float norm   = j / (float)len;
+
+            float env;
+            if      (norm < 0.033f) env = norm / 0.033f;
+            else if (norm > 0.94f)  env = (1f - norm) / 0.06f;
+            else                    env = 1f;
+
+            float raw  = (float)(rng.NextDouble() * 2.0 - 1.0);
+            float buzz = Mathf.Sin(2f * Mathf.PI * 2800f * localT) * 0.45f
+                       + Mathf.Sin(2f * Mathf.PI * 4200f * localT) * 0.30f
+                       + Mathf.Sin(2f * Mathf.PI * 5600f * localT) * 0.15f
+                       + raw * 0.10f;
+
+            // AM rápida: imita el "chirrido" del Bovie
+            float am = 0.7f + 0.3f * Mathf.Sin(2f * Mathf.PI * 280f * localT);
+
+            d[start + j] += buzz * am * env * 0.80f;
+        }
+    }
+
+    // Flujo laminar de sala limpia: banda media suave y constante
+    AudioClip GenerateLaminar()
+    {
+        int    n  = Mathf.RoundToInt(SR * LOOP);
+        float[] d = new float[n];
+        var rng   = new System.Random(42);
+        float lp  = 0f;
+
+        for (int i = 0; i < n; i++)
+        {
+            float raw  = (float)(rng.NextDouble() * 2.0 - 1.0);
+            float prev = lp;
+            lp  = Mathf.Lerp(lp, raw, 0.06f);
+            d[i] = (lp - prev * 0.3f) * 0.48f;
+        }
+
+        int fade = Mathf.RoundToInt(SR * 0.2f);
+        for (int i = 0; i < fade; i++)
+        {
+            float t = i / (float)fade;
+            d[i]         *= t;
+            d[n - 1 - i] *= t;
+        }
+        return MakeClip("Laminar", d);
+    }
+
+    // Zumbido eléctrico: lámparas quirúrgicas + equipos (60 Hz + armónicos)
     AudioClip GenerateHum()
     {
         int n     = Mathf.RoundToInt(SR * LOOP);
@@ -67,131 +213,9 @@ public class QuirofanoAmbient : MonoBehaviour
             d[i] = (Mathf.Sin(2f * Mathf.PI * 60f  * t) * 0.50f
                   + Mathf.Sin(2f * Mathf.PI * 120f * t) * 0.22f
                   + Mathf.Sin(2f * Mathf.PI * 180f * t) * 0.10f
-                  + Mathf.Sin(2f * Mathf.PI * 240f * t) * 0.05f) * 0.35f;
+                  + Mathf.Sin(2f * Mathf.PI * 300f * t) * 0.04f) * 0.32f;
         }
         return MakeClip("Hum", d);
-    }
-
-    // Ventilador mecánico: 10 resp/min → periodo exacto de 6s, loop de 12s sin corte
-    AudioClip GenerateVentilator()
-    {
-        int    n   = Mathf.RoundToInt(SR * LOOP);
-        float[] d  = new float[n];
-        var rng    = new System.Random(99);
-        float prev = 0f;
-
-        const float breathHz = 10f / 60f;   // 0.1667 Hz, periodo = 6s
-
-        for (int i = 0; i < n; i++)
-        {
-            float t = i / (float)SR;
-
-            // Ruido filtrado (simula flujo de aire)
-            float raw = (float)(rng.NextDouble() * 2.0 - 1.0);
-            prev = Mathf.Lerp(prev, raw, 0.013f);
-
-            // Envelope de respiración: rango [0.35, 1.0] — nunca cae a cero
-            float phase  = 0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * breathHz * t - Mathf.PI * 0.5f);
-            float breath = 0.35f + 0.65f * Mathf.Pow(phase, 0.6f);
-
-            // Click mecánico suave al cambio de ciclo (media onda seno, no exponencial)
-            float mechPhase = (t * breathHz) % 1f;
-            float mechClick = mechPhase < 0.04f
-                ? Mathf.Sin(Mathf.PI * mechPhase / 0.04f) * 0.10f
-                : 0f;
-
-            d[i] = prev * breath * 0.75f + mechClick;
-        }
-
-        // Fade muy corto solo en los extremos del loop (0.08s) para evitar click de costura
-        int fade = Mathf.RoundToInt(SR * 0.08f);
-        for (int i = 0; i < fade; i++)
-        {
-            float t = i / (float)fade;
-            d[i]         *= t;
-            d[n - 1 - i] *= t;
-        }
-
-        return MakeClip("Ventilator", d);
-    }
-
-    // HVAC / climatización: flujo de aire constante de alta frecuencia
-    AudioClip GenerateHvac()
-    {
-        int    n    = Mathf.RoundToInt(SR * LOOP);
-        float[] d   = new float[n];
-        var rng     = new System.Random(42);
-        float lp1   = 0f, lp2 = 0f;
-
-        for (int i = 0; i < n; i++)
-        {
-            float raw = (float)(rng.NextDouble() * 2.0 - 1.0);
-            lp1 = Mathf.Lerp(lp1, raw,  0.07f);
-            lp2 = Mathf.Lerp(lp2, lp1,  0.04f);
-            // Paso-alto = señal – paso-bajo → sonido de flujo, sin bajos
-            d[i] = (raw - lp2) * 0.38f;
-        }
-
-        int fade = Mathf.RoundToInt(SR * 0.15f);
-        for (int i = 0; i < fade; i++)
-        {
-            float t = i / (float)fade;
-            d[i]         *= t;
-            d[n - 1 - i] *= t;
-        }
-        return MakeClip("HVAC", d);
-    }
-
-    // Goteo IV: ~1.3 gotas/s con tono corto decayente y pequeña variación
-    AudioClip GenerateDrip()
-    {
-        int    n           = Mathf.RoundToInt(SR * LOOP);
-        float[] d          = new float[n];
-        var rng            = new System.Random(7);
-
-        const float dripHz = 1.3f;
-        int dripSamples    = Mathf.RoundToInt(SR / dripHz);
-
-        // Frecuencia fija por gota (pre-generada)
-        int numDrips = n / dripSamples + 2;
-        float[] freqs = new float[numDrips];
-        for (int k = 0; k < numDrips; k++)
-            freqs[k] = 750f + (float)(rng.NextDouble() * 250.0);
-
-        for (int i = 0; i < n; i++)
-        {
-            int   di      = i / dripSamples;
-            int   offset  = i % dripSamples;
-            float envTime = offset / (float)SR;
-            float env     = Mathf.Exp(-envTime / 0.018f);
-
-            if (env > 0.005f)
-            {
-                float t    = i / (float)SR;
-                float freq = freqs[Mathf.Min(di, numDrips - 1)];
-                // Gota: tono puro con decaimiento + clic inicial de ruido
-                float noise = di < numDrips ? (float)(rng.NextDouble() * 2 - 1) * 0.25f : 0f;
-                d[i] = (Mathf.Sin(2f * Mathf.PI * freq * t) + noise) * env * 0.55f;
-            }
-        }
-        return MakeClip("Drip", d);
-    }
-
-    // Presencia de sala: ruido muy suave de fondo
-    AudioClip GenerateNoise()
-    {
-        int    n   = Mathf.RoundToInt(SR * LOOP);
-        float[] d  = new float[n];
-        var rng    = new System.Random(13);
-        float prev = 0f;
-
-        for (int i = 0; i < n; i++)
-        {
-            float raw = (float)(rng.NextDouble() * 2.0 - 1.0);
-            prev = Mathf.Lerp(prev, raw, 0.022f);
-            d[i] = prev * 0.32f;
-        }
-        return MakeClip("Noise", d);
     }
 
     static AudioClip MakeClip(string label, float[] data)
