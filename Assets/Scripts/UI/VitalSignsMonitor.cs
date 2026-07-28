@@ -204,10 +204,16 @@ public class VitalSignsMonitor : MonoBehaviour
 
     float PhysStat(float hr, float spo2, float sys)
     {
-        float h = 1f - Mathf.Clamp01((hr   -  60f) / 120f);
-        float o =      Mathf.Clamp01((spo2 -  60f) /  40f);
-        float b =      Mathf.Clamp01((sys  -  60f) /  60f);
-        return (h * 0.3f + o * 0.4f + b * 0.3f) * 100f;
+        // HR: óptimo 60-100. Penaliza taquicardia Y bradicardia/paro cardíaco
+        float h;
+        if (hr < 60f)
+            h = Mathf.Clamp01((hr - 15f) / 45f);       // 15 bpm→0%,  60 bpm→100%
+        else
+            h = 1f - Mathf.Clamp01((hr - 100f) / 80f); // 100 bpm→100%, 180 bpm→0%
+
+        float o = Mathf.Clamp01((spo2 - 60f) / 40f);
+        float b = Mathf.Clamp01((sys  - 50f) / 70f);
+        return Mathf.Clamp(h * 40f + o * 35f + b * 25f, 2f, 98f);
     }
 
     // ── Waveform scrolling ────────────────────────────────────────────────
@@ -355,17 +361,19 @@ public class VitalSignsMonitor : MonoBehaviour
         Anchor(barBG, 10, 8, CW - 20, barH);
         barBG.AddComponent<Image>().color = new Color(0.04f, 0.08f, 0.05f, 1f);
 
+        // Track ocupa todo el ancho del fondo para que fillAmount coincida visualmente
         var barTrack = MakeRect("BarTrack", barBG.transform);
-        Anchor(barTrack, 8, 8, (CW - 36) * 0.72f, barH - 22);
+        Stretch(barTrack, 3);
         barTrack.AddComponent<Image>().color = new Color(0.06f, 0.12f, 0.08f, 1f);
 
         var barFillGO = MakeRect("BarFill", barTrack.transform);
         _physFill = barFillGO.AddComponent<Image>();
-        _physFill.type = Image.Type.Filled;
+        _physFill.type       = Image.Type.Filled;
         _physFill.fillMethod = Image.FillMethod.Horizontal;
+        _physFill.fillOrigin = (int)Image.OriginHorizontal.Left;
         _physFill.fillAmount = 0.35f;
         _physFill.color = C_YELLOW;
-        Stretch(barFillGO, 1);
+        Stretch(barFillGO, 0);
 
         _lblPhys = MakeTMP("PhysTxt", barBG.transform, "PHYS STAT  35%",
             10f, new Color(0.6f, 0.9f, 0.7f, 1f), TextAlignmentOptions.Left, false);

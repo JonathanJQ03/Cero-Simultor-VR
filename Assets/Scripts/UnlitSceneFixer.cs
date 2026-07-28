@@ -44,8 +44,15 @@ public class UnlitSceneFixer : MonoBehaviour
                 if (tex == null && mat.HasProperty("_MainTex")) tex = mat.GetTexture("_MainTex");
                 if (mat.HasProperty("_BaseColor")) col = mat.GetColor("_BaseColor");
 
+                var prevScale  = mat.mainTextureScale;
+                var prevOffset = mat.mainTextureOffset;
                 mat.shader = unlitShader;
-                if (tex != null) mat.SetTexture("_BaseMap", tex);
+                if (tex != null)
+                {
+                    mat.SetTexture("_BaseMap", tex);
+                    mat.mainTextureScale  = prevScale;
+                    mat.mainTextureOffset = prevOffset;
+                }
                 mat.SetColor("_BaseColor", col);
                 changed = true;
                 count++;
