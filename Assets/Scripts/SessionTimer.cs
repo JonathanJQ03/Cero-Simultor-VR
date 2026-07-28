@@ -50,7 +50,8 @@ public class SessionTimer : MonoBehaviour
             // ClockCountdown toma el control — apagar HUD
             StopTimer();
             if (_hudCanvas != null) { Destroy(_hudCanvas); _hudCanvas = null; _hudText = null; }
-            SceneManager.sceneLoaded -= OnSceneLoaded;
+            // NO desuscribir aquí: si el usuario pausa y regresa al menú,
+            // aún necesitamos capturar "MenuPrincipal" para destruir el timer.
         }
         else if (scene.name == "MenuPrincipal")
         {
@@ -123,6 +124,8 @@ public class SessionTimer : MonoBehaviour
 
     public void StartTimer()
     {
+        // Si el HUD fue destruido (p.ej. sesión anterior), reconstruirlo
+        if (_hudCanvas == null) BuildHUD();
         if (IsRunning) return;
         IsRunning = true;
     }
