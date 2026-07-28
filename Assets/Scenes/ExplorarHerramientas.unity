@@ -373,7 +373,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Monitor Portatil
+  m_text: Bisturi
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4354,7 +4354,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4a9a008cb98a24547ad305840ffd5390, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5c07e413fa624ae4fb7b62ffbf62858c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

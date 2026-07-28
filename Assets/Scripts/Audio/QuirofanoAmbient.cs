@@ -3,7 +3,7 @@ using UnityEngine;
 public class QuirofanoAmbient : MonoBehaviour
 {
     [Header("Volúmenes")]
-    [Range(0f, 1f)] public float ventilatorVolume    = 0.55f;  // respirador mecánico
+    [Range(0f, 1f)] public float ventilatorVolume    = 0.18f;  // respirador mecánico
     [Range(0f, 1f)] public float suctionVolume       = 0.30f;  // aspirador quirúrgico
     [Range(0f, 1f)] public float electrocauterVolume = 0.45f;  // electrocauterio (Bovie)
     [Range(0f, 1f)] public float laminarVolume       = 0.08f;  // flujo laminar de sala

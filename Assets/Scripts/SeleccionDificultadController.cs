@@ -15,7 +15,7 @@ public class SeleccionDificultadController : MonoBehaviour
     static readonly Color C_RED      = new Color(0.95f, 0.30f, 0.20f);
     static readonly Color C_MUTED    = new Color(0.55f, 0.65f, 0.75f);
 
-    void Awake() => BuildUI();
+    void Awake() { BuildUI(); SetupButtonAudio(); }
 
     void BuildUI()
     {
@@ -156,6 +156,19 @@ public class SeleccionDificultadController : MonoBehaviour
     }
 
     void OnMenuClicked() => SceneManager.LoadScene("MenuPrincipal");
+
+    void SetupButtonAudio()
+    {
+        if (UIAudioManager.Instance == null)
+            new GameObject("_UIAudioManager").AddComponent<UIAudioManager>();
+
+        var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var btn in buttons)
+        {
+            if (btn.GetComponent<MenuButtonAudio>() == null)
+                btn.gameObject.AddComponent<MenuButtonAudio>();
+        }
+    }
 
     // Helpers
     static TextMeshProUGUI MkTMP(Transform parent, string name, string text,

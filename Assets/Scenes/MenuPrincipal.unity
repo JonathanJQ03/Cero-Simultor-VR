@@ -1017,7 +1017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23cb73881be5cb54c959272f2193077e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuMusicAmbient
-  volume: 0.28
+  volume: 1
 --- !u!28 &759705538
 Texture2D:
   m_ObjectHideFlags: 0

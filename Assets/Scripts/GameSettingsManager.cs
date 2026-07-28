@@ -20,7 +20,7 @@ public class GameSettingsManager : MonoBehaviour
     // Propiedades de solo lectura para que otros scripts lean los valores actuales
     public static float MasterVolume => PlayerPrefs.GetFloat(K_VOL,   0.8f);
     public static float FxVolume     => PlayerPrefs.GetFloat(K_FX,    0.8f);
-    public static float MusicVolume  => PlayerPrefs.GetFloat(K_MUSIC, 0.5f);
+    public static float MusicVolume  => PlayerPrefs.GetFloat(K_MUSIC, 1.0f);
     public static int   Difficulty   => PlayerPrefs.GetInt(K_DIFF, 1);
 
     // Segundos de countdown según dificultad

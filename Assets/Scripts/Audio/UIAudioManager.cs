@@ -27,8 +27,8 @@ public class UIAudioManager : MonoBehaviour
         _clickClip = GenerateClick();
     }
 
-    public void PlayHover() => _src.PlayOneShot(_hoverClip, hoverVolume);
-    public void PlayClick() => _src.PlayOneShot(_clickClip, clickVolume);
+    public void PlayHover() => _src.PlayOneShot(_hoverClip, hoverVolume * GameSettingsManager.FxVolume);
+    public void PlayClick() => _src.PlayOneShot(_clickClip, clickVolume * GameSettingsManager.FxVolume);
 
     // Hover: tono suave corto (soft beep 600Hz)
     static AudioClip GenerateHover()

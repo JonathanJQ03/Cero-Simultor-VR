@@ -11,7 +11,7 @@ public class MenuMusicAmbient : MonoBehaviour
 
     AudioSource _src;
     const int   SR   = 22050;
-    const float LOOP = 10f;
+    const float LOOP = 40f;
 
     void Awake()
     {
@@ -57,42 +57,60 @@ public class MenuMusicAmbient : MonoBehaviour
         _src.Play();
     }
 
-    // Pad suave en Do mayor (Do4-Mi4-Sol4-Do5) con respiración lenta
+    // Cuerdas en trémolo — Dm7 cinematográfico
     AudioClip GeneratePad()
     {
-        int     n   = Mathf.RoundToInt(SR * LOOP);
-        float[] d   = new float[n];
+        int     n = Mathf.RoundToInt(SR * LOOP);
+        float[] d = new float[n];
 
-        // Do mayor: C4=261.6, E4=329.6, G4=392.0, C5=523.3, G3=196.0
-        float[] freqs = { 196.0f, 261.6f, 329.6f, 392.0f, 523.3f };
-        float[] amps  = { 0.22f,  0.32f,  0.26f,  0.20f,  0.12f };
+        // Dm7: D2 drone grave, D3, F3, A3, C4, A4 shimmer
+        float[] freqs = { 73.4f,  146.8f, 174.6f, 220.0f, 261.6f, 440.0f };
+        float[] amps  = { 0.28f,  0.24f,  0.22f,  0.20f,  0.15f,  0.07f };
 
-        float breathRate = 0.08f;   // respiración muy lenta (~1 ciclo / 12s)
-        float lfoRate    = 0.05f;   // vibrato ultra lento
+        // 3 copias ligeramente desafinadas por nota → efecto ensemble de cuerdas
+        float[] detune = { 1.0000f, 1.0012f, 0.9988f };
+
+        float tremoloRate  = 7.2f;   // ~7Hz → trémolo de arco
+        float tremoloDepth = 0.52f;
+        float buildRate    = 0.05f;  // oleada dramática lenta
+
+        var rng = new System.Random(77);
 
         for (int i = 0; i < n; i++)
         {
-            float t = i / (float)SR;
+            float t     = i / (float)SR;
+            float tNorm = i / (float)n;
 
-            // Modulación de volumen suave (inhala/exhala)
-            float breath = 0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * breathRate * t);
+            // Trémolo: simula el arco de cuerda
+            float tremolo = 1f - tremoloDepth
+                          + tremoloDepth * Mathf.Abs(Mathf.Sin(Mathf.PI * tremoloRate * t));
 
-            // LFO de frecuencia muy sutil
-            float lfo = 1f + 0.003f * Mathf.Sin(2f * Mathf.PI * lfoRate * t);
+            // Construcción dramática: sube en la primera mitad, baja al final
+            float build = 0.65f + 0.35f * Mathf.Sin(Mathf.PI * tNorm);
 
             float s = 0f;
             for (int f = 0; f < freqs.Length; f++)
             {
-                float hz = freqs[f] * lfo;
-                s += Mathf.Sin(2f * Mathf.PI * hz * t)         * amps[f]
-                   + Mathf.Sin(2f * Mathf.PI * hz * 2f * t)    * amps[f] * 0.12f;
+                for (int k = 0; k < detune.Length; k++)
+                {
+                    float hz = freqs[f] * detune[k];
+                    // Fundamental + armónicos para timbre de cuerda
+                    s += Mathf.Sin(2f * Mathf.PI * hz        * t) * amps[f] * 0.58f
+                       + Mathf.Sin(2f * Mathf.PI * hz * 2f   * t) * amps[f] * 0.24f
+                       + Mathf.Sin(2f * Mathf.PI * hz * 3f   * t) * amps[f] * 0.11f
+                       + Mathf.Sin(2f * Mathf.PI * hz * 4f   * t) * amps[f] * 0.05f;
+                }
             }
+            s /= detune.Length; // normalizar las 3 copias
 
-            d[i] = s * breath * 0.45f;
+            // Ruido de arco muy sutil
+            float noise = (float)(rng.NextDouble() * 2.0 - 1.0) * 0.005f;
+
+            d[i] = (s * tremolo * build + noise) * 0.95f;
         }
 
-        // Fade in/out para evitar click en el loop
-        int fade = Mathf.RoundToInt(SR * 0.4f);
+        // Fade in/out para loop sin click
+        int fade = Mathf.RoundToInt(SR * 5f);
         for (int i = 0; i < fade; i++)
         {
             float t = i / (float)fade;
@@ -100,7 +118,7 @@ public class MenuMusicAmbient : MonoBehaviour
             d[n - 1 - i] *= t;
         }
 
-        var c = AudioClip.Create("MenuPad", n, 1, SR, false);
+        var c = AudioClip.Create("MenuCinematic", n, 1, SR, false);
         c.SetData(d, 0);
         return c;
     }
